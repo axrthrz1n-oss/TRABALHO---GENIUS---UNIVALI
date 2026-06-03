@@ -1,22 +1,28 @@
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+#include <cstdlib>   // rand, srand
+#include <ctime>     // time
 #ifdef _WIN32
-    #include <windows.h>
+    #include <windows.h> 
 #else
-    #include <unistd.h>
+    #include <unistd.h>  
 #endif
 
 using namespace std;
 
-//  VARIAVEIS GLOBAIS DE DIFICULDADE - 
-int dificuldade       = 1;
-int tamanhoSequencia  = 10;
-int variacaoDigitos   = 3;
-int digitosPorRodada  = 2;
-int tempoEntreDigitos = 5;
+// =====================================================================
+//  VARIAVEIS GLOBAIS DE DIFICULDADE
+// =====================================================================
+int dificuldade       = 1;   // 1 = Facil, 2 = Media, 3 = Dificil
+int tamanhoSequencia  = 10;  // quantos numeros tem a sequencia total
+int variacaoDigitos   = 3;   // numeros vao de 1 ate variacaoDigitos
+int digitosPorRodada  = 2;   // quantos novos digitos aparecem por rodada
+int tempoEntreDigitos = 5;   // segundos entre cada digito mostrado
 
-//  FUNCOES AUXILIARES -
+// =====================================================================
+//  FUNCOES AUXILIARES
+// =====================================================================
+
+// Limpa a tela 
 void limparTela() {
     #ifdef _WIN32
         system("cls");
@@ -25,36 +31,44 @@ void limparTela() {
     #endif
 }
 
+// Pausa o programa por X segundos 
 void esperar(int segundos) {
     #ifdef _WIN32
-        Sleep(segundos * 1000);
+        Sleep(segundos * 1000); 
     #else
-        sleep(segundos);
+        sleep(segundos);      
     #endif
 }
 
+// Mostra uma linha separadora para ficar mais bonito
 void separador() {
     cout << "========================================" << endl;
 }
 
-//  MENU SOBRE -
+// =====================================================================
+//  MENU SOBRE
+// =====================================================================
 void menuSobre() {
     limparTela();
     separador();
     cout << "           SOBRE O JOGO" << endl;
     separador();
     cout << "Equipe de desenvolvimento:" << endl;
-    cout << "  - Membro 1: Arthur Ferraz" << endl;
-    cout << "  - Membro 2: Vicenzo Radin" << endl;
+    cout << "  - Vicenzo Radin" << endl;
+    cout << "  - Arthur Ferraz" << endl;
     cout << endl;
-    cout << "Professor/Disciplina: Felsky / Algoritmos e Programacao" << endl;
+    cout << "Data: 02 de junho/2026" << endl;
+    cout << "Professor: Felski" << endl;
+    cout << "Disciplina: Algoritmos e Programacao" << endl;
     separador();
     cout << "\nPressione ENTER para voltar ao menu...";
     cin.ignore();
     cin.get();
 }
 
-//  MENU DIFICULDADE -
+// =====================================================================
+//  MENU DIFICULDADE
+// =====================================================================
 void menuDificuldade() {
     int escolha;
 
@@ -70,6 +84,7 @@ void menuDificuldade() {
     cin >> escolha;
 
     if (escolha == 1) {
+        // Dificuldade Facil: valores fixos conforme o enunciado
         dificuldade       = 1;
         tamanhoSequencia  = 10;
         variacaoDigitos   = 3;
@@ -78,6 +93,7 @@ void menuDificuldade() {
         cout << "\nDificuldade FACIL selecionada!" << endl;
 
     } else if (escolha == 2) {
+        // Dificuldade Media: jogador configura tudo
         dificuldade = 2;
         cout << "\n--- Configuracao MEDIA ---" << endl;
 
@@ -96,6 +112,8 @@ void menuDificuldade() {
         cout << "\nDificuldade MEDIA configurada!" << endl;
 
     } else if (escolha == 3) {
+        // Dificuldade Dificil: jogador configura tamanho e variacao
+        // tempo e quantidade de digitos sao progressivos (diminuem a cada rodada)
         dificuldade = 3;
         cout << "\n--- Configuracao DIFICIL ---" << endl;
 
@@ -105,11 +123,8 @@ void menuDificuldade() {
         cout << "Variacao de digitos - de 1 ate quanto? (ex: 4): ";
         cin >> variacaoDigitos;
 
-        // CORRECAO: jogador configura os digitos iniciais por rodada
-        cout << "Quantos digitos aparecem na primeira rodada? (ex: 2): ";
-        cin >> digitosPorRodada;
-
-        // Tempo inicial fixo em 5s — vai diminuindo progressivamente
+        // Valores iniciais — vao diminuindo durante o jogo
+        digitosPorRodada  = 2;
         tempoEntreDigitos = 5;
 
         cout << "\nDificuldade DIFICIL configurada! Tempo e digitos serao progressivos." << endl;
@@ -123,17 +138,20 @@ void menuDificuldade() {
     cin.get();
 }
 
-//  JOGAR -
+// =====================================================================
+//  JOGAR
+// =====================================================================
 void jogar() {
     limparTela();
     separador();
     cout << "              GENIUS" << endl;
     separador();
 
+    // Nome da dificuldade para mostrar nas mensagens
     string nomeDificuldade;
-    if (dificuldade == 1)      nomeDificuldade = "Facil";
+    if (dificuldade == 1) nomeDificuldade = "Facil";
     else if (dificuldade == 2) nomeDificuldade = "Media";
-    else                       nomeDificuldade = "Dificil";
+    else nomeDificuldade = "Dificil";
 
     cout << "Dificuldade: " << nomeDificuldade << endl;
     cout << "Sequencia de " << tamanhoSequencia << " digitos (1 a " << variacaoDigitos << ")" << endl;
@@ -141,29 +159,31 @@ void jogar() {
     cin.ignore();
     cin.get();
 
-    // - Gerar vetor com a sequencia completa 
-    int sequencia[100];
-    srand(time(0));
+    // --- Gerar o vetor com a sequencia completa ---
+    int sequencia[100]; // vetor fixo de 100 posicoes
+    srand(time(0));     // inicializa o gerador de numeros aleatorios
 
     for (int i = 0; i < tamanhoSequencia; i++) {
+        // rand() % variacaoDigitos gera de 0 ate (variacao-1), entao somamos 1
         sequencia[i] = (rand() % variacaoDigitos) + 1;
     }
 
-    // - Variaveis de controle
+    // --- Variaveis de controle da rodada ---
     int digitosMostradosAteAgora = digitosPorRodada;
     int tempoAtual               = tempoEntreDigitos;
-    int digitosAcertadosTotal    = 0; // CORRECAO: acertos acumulados no jogo inteiro
+    int acertosTotal             = 0; // acertos acumulados em todas as rodadas
     bool jogadorVenceu           = false;
     bool jogadorPerdeu           = false;
 
-    // - Loop das rodadas
+    // --- Loop das rodadas ---
     while (!jogadorVenceu && !jogadorPerdeu) {
 
+        // Garante que nao ultrapassamos o tamanho da sequencia
         if (digitosMostradosAteAgora > tamanhoSequencia) {
             digitosMostradosAteAgora = tamanhoSequencia;
         }
 
-        // - MOSTRAR A SEQUENCIA 
+        // ---- FASE DE MOSTRAR A SEQUENCIA ----
         limparTela();
         cout << "Memorize a sequencia!" << endl;
         esperar(2);
@@ -175,18 +195,17 @@ void jogar() {
             cout << "   >>> " << sequencia[i] << " <<<" << endl;
             esperar(tempoAtual);
             limparTela();
-            esperar(1);
+            esperar(1); // pausa entre digitos
         }
 
-        // - ENTRADA DO JOGADOR 
+        // ---- FASE DE ENTRADA DO JOGADOR ----
         limparTela();
-        int tempoMaximo = tempoAtual * digitosMostradosAteAgora;
         cout << "Agora e sua vez! Digite os " << digitosMostradosAteAgora << " numeros:" << endl;
-        cout << "(tempo maximo estimado: " << tempoMaximo << " segundos)" << endl;
+        cout << "(voce tem " << (tempoAtual * digitosMostradosAteAgora) << " segundos no total)" << endl;
         cout << endl;
 
-        bool rodadaAcertada    = true;
-        int acertosNestaRodada = 0;
+        bool rodadaAcertada  = true;
+        int acertosRodada    = 0;
 
         for (int i = 0; i < digitosMostradosAteAgora; i++) {
             int resposta;
@@ -194,41 +213,42 @@ void jogar() {
             cin >> resposta;
 
             if (resposta == sequencia[i]) {
-                acertosNestaRodada++;
+                acertosRodada++;
             } else {
+                // Errou — mostra onde errou e encerra
                 cout << "\nErrou! O numero era: " << sequencia[i] << endl;
                 rodadaAcertada = false;
                 jogadorPerdeu  = true;
-
-                // CORRECAO: soma os acertos desta rodada ao total antes de encerrar
-                digitosAcertadosTotal += acertosNestaRodada;
+                acertosTotal  += acertosRodada; // soma os acertos desta rodada antes de sair
                 break;
             }
         }
 
-        // - RESULTADO DA RODADA 
+        // ---- VERIFICAR RESULTADO DA RODADA ----
         if (rodadaAcertada) {
-            // Soma todos os digitos desta rodada ao total
-            digitosAcertadosTotal += acertosNestaRodada;
+            acertosTotal += acertosRodada; // rodada completa: soma tudo
 
+            // Verificar se completou a sequencia inteira
             if (digitosMostradosAteAgora >= tamanhoSequencia) {
                 jogadorVenceu = true;
             } else {
+                // Proxima rodada
                 cout << "\nParabens! Rodada acertada! Preparando a proxima rodada..." << endl;
                 esperar(3);
 
+                // Aumentar dificuldade para a proxima rodada
                 digitosMostradosAteAgora += digitosPorRodada;
 
-                // Na dificuldade Dificil tempo e digitos sao progressivos
+                // Na dificuldade Dificil o tempo diminui progressivamente
                 if (dificuldade == 3) {
-                    if (tempoAtual > 1)        tempoAtual--;
-                    if (digitosPorRodada < 5)  digitosPorRodada++;
+                    if (tempoAtual > 1)          tempoAtual--;
+                    if (digitosPorRodada < 4)    digitosPorRodada++;
                 }
             }
         }
     }
 
-    // - RESULTADO FINAL 
+    // ---- RESULTADO FINAL ----
     limparTela();
     separador();
 
@@ -237,11 +257,9 @@ void jogar() {
         cout << "  Dificuldade: " << nomeDificuldade << endl;
         cout << "  Voce acertou toda a sequencia de " << tamanhoSequencia << " numeros!" << endl;
     } else {
-        // CORRECAO: mostra acertos totais no jogo inteiro, nao so da ultima rodada
         cout << "  VOCE PERDEU!" << endl;
-        cout << "  Dificuldade: " << nomeDificuldade << endl;
         cout << "  Voce perdeu na dificuldade " << nomeDificuldade
-             << ", acertando " << digitosAcertadosTotal
+             << ", acertando " << acertosTotal
              << " dos " << tamanhoSequencia << " numeros da sequencia." << endl;
     }
 
@@ -251,10 +269,13 @@ void jogar() {
     cin.get();
 }
 
-//  FUNCAO PRINCIPAL -
+// =====================================================================
+//  FUNCAO PRINCIPAL
+// =====================================================================
 int main() {
     int opcao;
 
+    // O jogo so encerra quando o jogador escolher "Fim" (opcao 4)
     do {
         limparTela();
         separador();
@@ -268,10 +289,13 @@ int main() {
         cout << "Escolha: ";
         cin >> opcao;
 
-        if      (opcao == 1) jogar();
-        else if (opcao == 2) menuDificuldade();
-        else if (opcao == 3) menuSobre();
-        else if (opcao == 4) {
+        if (opcao == 1) {
+            jogar();
+        } else if (opcao == 2) {
+            menuDificuldade();
+        } else if (opcao == 3) {
+            menuSobre();
+        } else if (opcao == 4) {
             limparTela();
             cout << "Ate a proxima! Saindo do jogo..." << endl;
         } else {
@@ -279,7 +303,7 @@ int main() {
             esperar(2);
         }
 
-    } while (opcao != 4);
+    } while (opcao != 4); // continua ate escolher Fim
 
     return 0;
 }
