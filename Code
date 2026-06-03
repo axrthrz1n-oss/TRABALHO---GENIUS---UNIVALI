@@ -141,7 +141,7 @@ void jogar() {
     cin.ignore();
     cin.get();
 
-    // --- Gerar vetor com a sequencia completa ---
+    // - Gerar vetor com a sequencia completa 
     int sequencia[100];
     srand(time(0));
 
